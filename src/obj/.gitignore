@@ -1,0 +1,25 @@
+src/*.exe
+src/Cubits
+src/Cubitsd
+src/test_Cubits
+src/build.h
+.*.swp
+*.*~*
+*.bak
+*.rej
+*.orig
+*.o
+*.patch
+.Cubits
+.Cubits
+#compilation and Qt preprocessor part
+*.qm
+Makefile
+Cubits-qt
+#resources cpp
+qrc_*.cpp
+#qt creator
+*.pro.user
+#mac specific
+.DS_Store
+build
