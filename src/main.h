@@ -36,7 +36,9 @@ static const int64 MAX_MINT_PROOF_OF_WORK = 150 * COIN;
 static const int64 MAX_MINT_PROOF_OF_STAKE = .03 * MAX_MINT_PROOF_OF_WORK;	
 static const int64 MIN_TXOUT_AMOUNT = MIN_TX_FEE;
 static const unsigned int MAX_TX_COMMENT_LEN = 140; //140 character (Twitter) limitation
-
+/** Split/Combine Threshold Max */
+static const int64 MAX_SPLIT_AMOUNT = 2000 * COIN;
+static const int64 MAX_COMBINE_AMOUNT = 300 * COIN;
 static const unsigned int FIX_TIME = 1391385600; // Feb 3 00:00:00 GMT. Fixes stake issue.
 
 inline bool MoneyRange(int64 nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
@@ -84,6 +86,8 @@ extern std::map<uint256, CBlock*> mapOrphanBlocks;
 
 // Settings
 extern int64 nTransactionFee;
+extern int64 nCombineThreshold;
+extern int64 nSplitThreshold;
 
 // Minimum disk space required - used in CheckDiskSpace()
 static const uint64 nMinDiskSpace = 52428800;
