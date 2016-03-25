@@ -4048,7 +4048,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
         }
     }
 
-    pblock->nBits = GetNextTargetRequired(pindexPrev, pblock->IsProofOfStake());
+    pblock->nBits = GetNextTargetRequired(pindexPrev, fProofOfStake);
 
     // Collect memory pool transactions into the block
     int64 nFees = 0;
@@ -4163,7 +4163,7 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
                 continue;
 
             // Timestamp limit
-            if (tx.nTime > GetAdjustedTime() || (pblock->IsProofOfStake() && tx.nTime > pblock->vtx[1].nTime))
+            if (tx.nTime > GetAdjustedTime() || (fProofOfStake && tx.nTime > pblock->vtx[1].nTime))
                 continue;
 
             // ppcoin: simplify transaction fee - allow free = false
@@ -4242,17 +4242,17 @@ CBlock* CreateNewBlock(CWallet* pwallet, bool fProofOfStake)
         if (fDebug && GetBoolArg("-printpriority"))
             printf("CreateNewBlock(): total size %"PRI64u"\n", nBlockSize);
 
-        if (pblock->IsProofOfWork())
+        if (!fProofOfStake)
             pblock->vtx[0].vout[0].nValue = GetProofOfWorkReward(pindexPrev->nHeight+1, nFees, pindexPrev->GetBlockHash());
 
 
         // Fill in header
         pblock->hashPrevBlock  = pindexPrev->GetBlockHash();
-        if (pblock->IsProofOfStake())
+        if (fProofOfStake)
             pblock->nTime      = pblock->vtx[1].nTime; //same as coinstake timestamp
         pblock->nTime          = max(pindexPrev->GetMedianTimePast()+1, pblock->GetMaxTransactionTime());
         pblock->nTime          = max(pblock->GetBlockTime(), pindexPrev->GetBlockTime() - nMaxClockDrift);
-        if (pblock->IsProofOfWork())
+        if (!fProofOfStake)
             pblock->UpdateTime(pindexPrev);
         pblock->nNonce         = 0;
     }
@@ -4426,6 +4426,7 @@ void CubitsMiner(CWallet *pwallet, bool fProofOfStake)
                 SetThreadPriority(THREAD_PRIORITY_NORMAL);
                 CheckWork(pblock.get(), *pwalletMain, reservekey);
                 SetThreadPriority(THREAD_PRIORITY_LOWEST);
+                Sleep(500);
             }
             Sleep(500);
             continue;
