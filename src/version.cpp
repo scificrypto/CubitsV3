@@ -11,7 +11,7 @@
 const std::string CLIENT_NAME("Cubits");
 
 // Client version number
-#define CLIENT_VERSION_SUFFIX   "-oro"
+#define CLIENT_VERSION_SUFFIX   "-Apollo"
 
 
 // The following part of the code determines the CLIENT_BUILD variable.
@@ -56,7 +56,7 @@ const std::string CLIENT_NAME("Cubits");
 
 #ifndef BUILD_DATE
 #    ifdef GIT_COMMIT_DATE
-#        define BUILD_DATE "July 4, 2013"
+#        define BUILD_DATE "March 28, 2016"
 #    else
 #        define BUILD_DATE __DATE__ ", " __TIME__
 #    endif

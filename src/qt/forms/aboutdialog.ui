@@ -91,8 +91,10 @@
         <cursorShape>IBeamCursor</cursorShape>
        </property>
        <property name="text">
-        <string>Copyright © 2013 The Cubits Development Team
-         </string>
+        <string>Copyright © 2009-2012 The Bitcon developers,
+Copyright © 2012-2013 The Cubits and PPCoin developers,
+Copyright © 2013-2016 The Cubits developers.
+        </string>
        </property>
        <property name="textInteractionFlags">
         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
