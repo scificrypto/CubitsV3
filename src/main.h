@@ -31,7 +31,7 @@ static const unsigned int MAX_ORPHAN_TRANSACTIONS = MAX_BLOCK_SIZE/100;
 static const unsigned int MAX_INV_SZ = 50000;
 static const int64 MIN_TX_FEE = 0.001 * COIN;
 static const int64 MIN_RELAY_TX_FEE = MIN_TX_FEE;
-static const int64 MAX_MONEY = 58000000 * COIN;
+static const int64 MAX_MONEY = 300000000 * COIN;
 static const int64 MAX_MINT_PROOF_OF_WORK = 150 * COIN;	
 static const int64 MAX_MINT_PROOF_OF_STAKE = .03 * MAX_MINT_PROOF_OF_WORK;	
 static const int64 MIN_TXOUT_AMOUNT = MIN_TX_FEE;
@@ -40,6 +40,7 @@ static const unsigned int MAX_TX_COMMENT_LEN = 140; //140 character (Twitter) li
 static const int64 MAX_SPLIT_AMOUNT = 2000 * COIN;
 static const int64 MAX_COMBINE_AMOUNT = 300 * COIN;
 static const unsigned int FIX_TIME = 1391385600; // Feb 3 00:00:00 GMT. Fixes stake issue.
+static const unsigned int VERSION2_SWITCH_TIME = 1461355200; // 22 Apr 2016 20:00:00 GMT
 
 inline bool MoneyRange(int64 nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
@@ -54,8 +55,14 @@ static const int fHaveUPnP = false;
 static const uint256 hashGenesisBlockOfficial("0x000004ef3e161ffba51ce7f2e8dd74fa63849c08c113a15e94014d84cc79392f");
 static const uint256 hashGenesisBlockTestNet("0x");
 
-static const int64 nMaxClockDrift = 2 * 60 * 60;        // two hours
-
+//static const int64 nMaxClockDrift = 2 * 60 * 60;        // two hours
+inline int64 GetClockDrift(int64 nTime)
+{
+    if (nTime > VERSION2_SWITCH_TIME)
+        return 10 * 60;  // up to 10 minutes Drift
+    else
+        return 2 * 60 * 60;  // up to 120 minutes Drift
+} 
 extern CScript COINBASE_FLAGS;
 
 
@@ -118,6 +125,11 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey);
 bool CheckProofOfWork(uint256 hash, unsigned int nBits);
 int64 GetProofOfWorkReward(int nHeight, int64 nFees, uint256 prevHash);
 int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTime);
+int64 GetProofOfStakeRewardV1(int64 nCoinAge, unsigned int nBits, unsigned int nTime);
+int64 GetProofOfStakeRewardV2(int64 nCoinAge, unsigned int nBits, unsigned int nTime);
+unsigned int GetStakeMinAge(unsigned int nTime);
+unsigned int GetStakeMaxAge(unsigned int nTime);
+
 unsigned int ComputeMinWork(unsigned int nBase, int64 nTime);
 int GetNumBlocksOfPeers();
 bool IsInitialBlockDownload();
