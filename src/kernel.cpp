@@ -9,7 +9,6 @@
 
 using namespace std;
 
-extern int nStakeMaxAge;
 extern int nStakeTargetSpacing;
 
 // Modifier interval: time to elapse before new modifier is computed
@@ -21,6 +20,19 @@ static std::map<int, unsigned int> mapStakeModifierCheckpoints =
     boost::assign::map_list_of
     ( 0, 0x0e00670bu )
     ;
+
+// Get time weight
+int64 GetWeight(int64 nIntervalBeginning, int64 nIntervalEnd)
+{
+	// Kernel hash weight starts from 0 at the 30-day min age
+	// this change increases active coins participating the hash and helps
+	// to secure the network when proof-of-stake difficulty is low
+
+        if ( nIntervalEnd > VERSION2_SWITCH_TIME )
+            return min(nIntervalEnd - nIntervalBeginning - GetStakeMinAge(nIntervalEnd), (int64)GetStakeMaxAge(nIntervalEnd));
+        else
+            return min(nIntervalEnd - nIntervalBeginning, (int64)GetStakeMaxAge(nIntervalEnd)) - GetStakeMinAge(nIntervalEnd);
+} 
 
 // Get the last stake modifier and its generation time from a given block
 static bool GetLastStakeModifier(const CBlockIndex* pindex, uint64& nStakeModifier, int64& nModifierTime)
