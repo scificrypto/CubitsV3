@@ -27,6 +27,7 @@ static MapCheckpoints mapCheckpoints =
         ( 0, hashGenesisBlockOfficial )
         ( 24000, uint256("0x00000000000057bf17aa1bd08f24990ef5d4167374de57ef197c4b01770d2a73"))
         ( 392392, uint256("0x00000000000886b8e0858541d1f245032b877d5cb9ff35487405710c1a0f2394"))
+        ( 444000, uint256("0x734c2c44ae2e14bcf8003ed5649e1f3a3dd8c2b3e42ff9667fd35d08a7052640"))
         ;
 
 
