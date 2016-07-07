@@ -46,12 +46,25 @@ void SendCoinsEntry::on_addressBookButton_clicked()
 {
     if(!model)
         return;
-    AddressBookPage dlg(AddressBookPage::ForSending, AddressBookPage::SendingTab, this);
-    dlg.setModel(model->getAddressTableModel());
-    if(dlg.exec())
+    if (model->getSplitBlock())
     {
-        ui->payTo->setText(dlg.getReturnValue());
-        ui->payAmount->setFocus();
+        AddressBookPage dlg(AddressBookPage::ForSending, AddressBookPage::ReceivingTab, this); 
+        dlg.setModel(model->getAddressTableModel()); 
+        if(dlg.exec()) 
+        { 
+            ui->payTo->setText(dlg.getReturnValue()); 
+            ui->payAmount->setFocus(); 
+        }
+    }
+    else 
+    { 
+        AddressBookPage dlg(AddressBookPage::ForSending, AddressBookPage::SendingTab, this); 
+        dlg.setModel(model->getAddressTableModel()); 
+        if(dlg.exec()) 
+        { 
+            ui->payTo->setText(dlg.getReturnValue()); 
+            ui->payAmount->setFocus(); 
+        } 
     }
 }
 
@@ -71,6 +84,7 @@ void SendCoinsEntry::setModel(WalletModel *model)
 
     if(model && model->getOptionsModel())
         connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
+    connect(ui->payAmount, SIGNAL(textChanged()), this, SIGNAL(payAmountChanged()));
 
     clear();
 }
