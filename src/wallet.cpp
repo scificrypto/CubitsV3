@@ -1347,7 +1347,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                 // Choose coins to use
                 set<pair<const CWalletTx*,unsigned int> > setCoins;
                 int64 nValueIn = 0;
-                if (!SelectCoins(nTotalValue, wtxNew.nTime, setCoins, nValueIn))
+                if (!SelectCoins(nTotalValue, wtxNew.nTime, setCoins, nValueIn, coinControl))
                     return false;
                 BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, setCoins)
                 {
