@@ -578,8 +578,7 @@ bool CWallet::IsChange(const CTxOut& txout) const
 
 int64 CWalletTx::GetTxTime() const
 {
-    int64 n = nTimeSmart;
-    return n ? n : nTimeReceived;
+    return nTime;
 }
 
 int CWalletTx::GetRequestCount() const
@@ -1504,17 +1503,30 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         return error("CreateCoinStake : invalid reserve balance amount");
     if (nBalance <= nReserveBalance)
         return false;
-    set<pair<const CWalletTx*,unsigned int> > setCoins;
+//    set<pair<const CWalletTx*,unsigned int> > setCoins;
+//    vector<const CWalletTx*> vwtxPrev;
+    // from presstab HyperStake - Initialize as static and don't update the set on every run of CreateCoinStake() in order to lighten resource use
+	static std::set<pair<const CWalletTx*,unsigned int> > setStakeCoins;
+	static int nLastStakeSetUpdate = 0; 
+    if(GetTime() - nLastStakeSetUpdate > nStakeSetUpdateTime)
+	{
+		int64 nValueIn = 0;
+        setStakeCoins.clear();
+		if (!SelectCoinsSimple(nBalance - nReserveBalance, txNew.nTime, nCoinbaseMaturity * nCoinbaseMaturityMultipiler, setStakeCoins, nValueIn))
+			return false;
+		nLastStakeSetUpdate = GetTime();
+	} 
+    
+//    int64 nValueIn = 0;
+//    if (!SelectCoinsSimple(nBalance - nReserveBalance, txNew.nTime, nCoinbaseMaturity * nCoinbaseMaturityMultipiler, setStakeCoins, nValueIn))
+//        return false;
+    if (setStakeCoins.empty())
+        return false;
     vector<const CWalletTx*> vwtxPrev;
-    int64 nValueIn = 0;
-    if (!SelectCoinsSimple(nBalance - nReserveBalance, txNew.nTime, nCoinbaseMaturity * nCoinbaseMaturityMultipiler, setCoins, nValueIn))
-        return false;
-    if (setCoins.empty())
-        return false;
     int64 nCredit = 0;
     CScript scriptPubKeyKernel;
     CTxDB txdb("r");
-    BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, setCoins)
+    BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, setStakeCoins)
     {
         CTxIndex txindex;
         {
@@ -1596,7 +1608,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     }
     if (nCredit == 0 || nCredit > nBalance - nReserveBalance)
         return false;
-    BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, setCoins)
+    BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, setStakeCoins)
     {
         // Attempt to add more inputs
         // Only add coins of the same key/address as kernel
@@ -1675,6 +1687,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     }
 
     // Successfully generated coinstake
+    nLastStakeSetUpdate = 0; //this will trigger stake set to repopulate next round 
     return true;
 }
 

@@ -87,6 +87,7 @@ public:
     bool fFileBacked;
     std::string strWalletFile;
     bool fSplitBlock;
+    int nStakeSetUpdateTime; 
 
     std::set<int64> setKeyPool;
 
@@ -104,6 +105,7 @@ public:
         pwalletdbEncryption = NULL;
         nOrderPosNext = 0;
         fSplitBlock = false;
+        nStakeSetUpdateTime = 300; // 5 minutes 
     }
     CWallet(std::string strWalletFileIn)
     {
@@ -115,6 +117,7 @@ public:
         pwalletdbEncryption = NULL;
         nOrderPosNext = 0;
         fSplitBlock = false;
+        nStakeSetUpdateTime = 300; // 5 minutes 
     }
 
     std::map<uint256, CWalletTx> mapWallet;
