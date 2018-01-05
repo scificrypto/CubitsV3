@@ -37,10 +37,11 @@ static const int64 MAX_MINT_PROOF_OF_STAKE = .03 * MAX_MINT_PROOF_OF_WORK;
 static const int64 MIN_TXOUT_AMOUNT = MIN_TX_FEE;
 static const unsigned int MAX_TX_COMMENT_LEN = 140; //140 character (Twitter) limitation
 /** Split/Combine Threshold Max */
-static const int64 MAX_SPLIT_AMOUNT = 2000 * COIN;
-static const int64 MAX_COMBINE_AMOUNT = 300 * COIN;
+static const int64 MAX_SPLIT_AMOUNT = 3000 * COIN;
+static const int64 MAX_COMBINE_AMOUNT = 500 * COIN;
 static const unsigned int FIX_TIME = 1391385600; // Feb 3 00:00:00 GMT. Fixes stake issue.
 static const unsigned int VERSION2_SWITCH_TIME = 1461355200; // 22 Apr 2016 20:00:00 GMT
+//static const int HARDFORK2_HEIGHT = 701280;
 
 inline bool MoneyRange(int64 nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.

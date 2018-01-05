@@ -46,7 +46,7 @@ unsigned int nStakeMinAge = 60 * 60 * 24 * 60; // minimum age for coin age
 unsigned int nStakeMaxAge = 60 * 60 * 24 * 120; // stake age of full weight
 unsigned int nStakeMinAgeV2 = 60 * 60 * 24 * 15; // minimum age for coin age
 unsigned int nStakeMaxAgeV2 = 60 * 60 * 24 * 45; // stake age of full weight
-unsigned int nStakeTargetSpacing = 60 * 3; // 33 Minute Block Spacing
+unsigned int nStakeTargetSpacing = 60 * 3; // 3 Minute Block Spacing
 const int64 nChainStartTime = 1382285485; 
 const int64 nTestNetStartTime = nChainStartTime; // 2013-08-03 18:00:00 GMT
 int nCoinbaseMaturity = 30; // mining need 50 confirm
@@ -951,11 +951,14 @@ uint256 WantedByOrphan(const CBlock* pblockOrphan)
 int64 GetProofOfWorkReward(int nHeight, int64 nFees, uint256 prevHash)
 {
 
-int64 nSubsidy = 150 * COIN; 
+    int64 nSubsidy = 150 * COIN; 
 
 	if (nHeight == 1) {nSubsidy = 20606250 * COIN;} 
 	
     nSubsidy >>= (nHeight / 64000);
+    
+//    if (nHeight >= HARDFORK2_HEIGHT)
+//         nSubsidy = 10 * COIN;
     
     return nSubsidy + nFees;
 }
@@ -2167,7 +2170,7 @@ bool CBlock::AcceptBlock()
     CBlockIndex* pindexPrev = (*mi).second;
     int nHeight = pindexPrev->nHeight+1;
     
-    if (IsProofOfWork() && nHeight > 412000)
+    if (IsProofOfWork() && nHeight > 412000) // && nHeight < HARDFORK2_HEIGHT)
         return DoS(100, error("AcceptBlock() : No proof-of-work allowed anymore (height = %d)", nHeight)); 
 
     // Check proof-of-work or proof-of-stake
