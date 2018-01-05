@@ -28,6 +28,7 @@ static MapCheckpoints mapCheckpoints =
         ( 24000, uint256("0x00000000000057bf17aa1bd08f24990ef5d4167374de57ef197c4b01770d2a73"))
         ( 392392, uint256("0x00000000000886b8e0858541d1f245032b877d5cb9ff35487405710c1a0f2394"))
         ( 444000, uint256("0x734c2c44ae2e14bcf8003ed5649e1f3a3dd8c2b3e42ff9667fd35d08a7052640"))
+        ( 700000, uint256("0x977b72e2aa43d46987ff2122fcff5a8ea3f3ace64ebd8b00afee62ad22a42f61"))
         ;
 
 
@@ -198,8 +199,8 @@ static MapCheckpoints mapCheckpointsTestnet =
         // Select the last proof-of-work block
         const CBlockIndex *pindex = GetLastBlockIndex(pindexBest, false);
         // Search forward for a block within max span and maturity window
-        while (pindex->pnext && (pindex->GetBlockTime() + CHECKPOINT_MAX_SPAN <= pindexBest->GetBlockTime() || pindex->nHeight + std::min(6, nCoinbaseMaturity - 20) <= pindexBest->nHeight))
-            pindex = pindex->pnext;
+        while (pindex->pprev && (pindex->nHeight + 8 > pindexBest->nHeight))
+            pindex = pindex->pprev;
         return pindex->GetBlockHash();
     }
 
@@ -367,7 +368,7 @@ static MapCheckpoints mapCheckpointsTestnet =
 }
 
 // ppcoin: sync-checkpoint master key
-const std::string CSyncCheckpoint::strMasterPubKey = "0489cab128b9f39a3e514a12c07a7644fa1808662195edcf2d4671b1cce76868b7f2f588a9dfad5753be3cd6b8e9518be439c936e2bad93a25bb6d32300fab41c3";
+const std::string CSyncCheckpoint::strMasterPubKey = "04307de832b8555bb6649e9c37ca1af6e1bffa21479eaccc5f8fd06a71080a0c3b4db675b34637590a8821fc298ec1c389f096760576db8e47754b3d655661c1ee";
 
 std::string CSyncCheckpoint::strMasterPrivKey = "";
 
