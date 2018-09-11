@@ -34,15 +34,20 @@ public:
 
 Value importprivkey(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() < 1 || params.size() > 2)
+    if (fHelp || params.size() < 1 || params.size() > 3)
         throw runtime_error(
-            "importprivkey <CubitsPrivkey> [label]\n"
+            "importprivkey <CubitsPrivkey> [label] [rescan=true]\n"
             "Adds a private key (as returned by dumpprivkey) to your wallet.");
 
     string strSecret = params[0].get_str();
     string strLabel = "";
     if (params.size() > 1)
         strLabel = params[1].get_str();
+        
+    // Whether to perform rescan after import
+    bool fRescan = true;
+    if (params.size() > 2)
+        fRescan = params[2].get_bool();
     CCubitsecret vchSecret;
     bool fGood = vchSecret.SetString(strSecret);
 
@@ -58,14 +63,20 @@ Value importprivkey(const Array& params, bool fHelp)
     {
         LOCK2(cs_main, pwalletMain->cs_wallet);
 
-        pwalletMain->MarkDirty();
-        pwalletMain->SetAddressBookName(vchAddress, strLabel);
+        // Don't throw error in case a key is already there
+        if (pwalletMain->HaveKey(vchAddress))
+            return Value::null;
 
         if (!pwalletMain->AddKey(key))
             throw JSONRPCError(RPC_WALLET_ERROR, "Error adding key to wallet");
 
-        pwalletMain->ScanForWalletTransactions(pindexGenesisBlock, true);
-        pwalletMain->ReacceptWalletTransactions();
+        pwalletMain->MarkDirty();
+        pwalletMain->SetAddressBookName(vchAddress, strLabel);
+        if (fRescan)
+        {
+            pwalletMain->ScanForWalletTransactions(pindexGenesisBlock, true);
+            pwalletMain->ReacceptWalletTransactions();
+        }
     }
 
     return Value::null;
