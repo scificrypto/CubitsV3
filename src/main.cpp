@@ -65,7 +65,7 @@ map<uint256, CBlock*> mapOrphanBlocks;
 multimap<uint256, CBlock*> mapOrphanBlocksByPrev;
 set<pair<COutPoint, unsigned int> > setStakeSeenOrphan;
 map<uint256, uint256> mapProofOfStake;
-
+map<unsigned int, unsigned int> mapHashedBlocks;
 map<uint256, CDataStream*> mapOrphanTransactions;
 map<uint256, map<uint256, CDataStream*> > mapOrphanTransactionsByPrev;
 
@@ -2276,6 +2276,11 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
         if (!CheckProofOfStake(pblock->vtx[1], pblock->nBits, hashProofOfStake))
         {
             printf("WARNING: ProcessBlock(): check proof-of-stake failed for block %s\n", hash.ToString().c_str());
+            
+            // ask for missing blocks  
+            if (pfrom)  
+                pfrom->PushGetBlocks(pindexBest, pblock->GetHash());
+                
             return false; // do not error here as we expect this during initial block download
         }
         if (!mapProofOfStake.count(hash)) // add to mapProofOfStake
@@ -4410,7 +4415,7 @@ void CubitsMiner(CWallet *pwallet, bool fProofOfStake)
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
 
     // Make this thread recognisable as the mining thread
-    RenameThread("Cubits-miner");
+    RenameThread("Cubits-stakeminer");
 
     // Each thread has its own key and counter
     CReserveKey reservekey(pwallet);
@@ -4433,6 +4438,15 @@ void CubitsMiner(CWallet *pwallet, bool fProofOfStake)
         {
             strMintWarning = strMintMessage;
             Sleep(1000);
+        }
+        
+        if(mapHashedBlocks.count(nBestHeight)) //search our map of hashed blocks, see if bestblock has been hashed yet
+        {
+            if(GetTime() - mapHashedBlocks[nBestHeight] < 30) // wait 30 sec until trying to hash again
+            {
+				Sleep(1000); // 1 second sleep for this thread
+                continue;
+            }
         }
         strMintWarning = "";
 
@@ -4602,7 +4616,7 @@ void static ThreadCubitsMiner(void* parg)
 void GenerateCubits(bool fGenerate, CWallet* pwallet)
 {
     fGenerateCubits = fGenerate;
-    nLimitProcessors = GetArg("-genproclimit", -1);
+    nLimitProcessors = 1; //GetArg("-genproclimit", -1);
     if (nLimitProcessors == 0)
         fGenerateCubits = false;
     fLimitProcessors = (nLimitProcessors != -1);

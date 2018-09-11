@@ -1535,24 +1535,26 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 continue;
         }
         // Read block header
+        
         CBlock block;
         {
             LOCK2(cs_main, cs_wallet);
             if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
                 continue;
         }
-        static int nMaxStakeSearchInterval = 60;
-        if (block.GetBlockTime() + GetStakeMinAge(block.GetBlockTime()) > txNew.nTime - nMaxStakeSearchInterval)
-            continue; // only count coins meeting min age requirement
+       // static int nMaxStakeSearchInterval = 60;
+       // if (block.GetBlockTime() + GetStakeMinAge(block.GetBlockTime()) > txNew.nTime - nMaxStakeSearchInterval)
+       //     continue; // only count coins meeting min age requirement
 
         bool fKernelFound = false;
-        for (unsigned int n=0; n<min(nSearchInterval,(int64)nMaxStakeSearchInterval) && !fKernelFound && !fShutdown; n++)
-        {
+      //  for (unsigned int n=0; n<min(nSearchInterval,(int64)nMaxStakeSearchInterval) && !fKernelFound && !fShutdown; n++)
+      //  {
             // Search backward in time from the given txNew timestamp 
             // Search nSearchInterval seconds back up to nMaxStakeSearchInterval
             uint256 hashProofOfStake = 0;
             COutPoint prevoutStake = COutPoint(pcoin.first->GetHash(), pcoin.second);
-            if (CheckStakeKernelHash(nBits, block, txindex.pos.nTxPos - txindex.pos.nBlockPos, *pcoin.first, prevoutStake, txNew.nTime - n, hashProofOfStake))
+            unsigned int txNewTime = txNew.nTime;
+            if (CheckStakeKernelHash(nBits, block, txindex.pos.nTxPos - txindex.pos.nBlockPos, *pcoin.first, prevoutStake, txNewTime, false, hashProofOfStake))
             {
                 // Found a kernel
                 if (fDebug && GetBoolArg("-printcoinstake"))
@@ -1590,7 +1592,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 else
                     scriptPubKeyOut = scriptPubKeyKernel;
 
-                txNew.nTime -= n; 
+                txNew.nTime = txNewTime; 
                 txNew.vin.push_back(CTxIn(pcoin.first->GetHash(), pcoin.second));
                 nCredit += pcoin.first->vout[pcoin.second].nValue;
                 vwtxPrev.push_back(pcoin.first);
@@ -1602,7 +1604,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                 fKernelFound = true;
                 break;
             }
-        }
+      //  }
         if (fKernelFound || fShutdown)
             break; // if kernel is found stop searching
     }
@@ -1645,7 +1647,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     }
 
     int64 nMinFee = 0;
-    loop
+    while (true)
     {
         // Set output amount
         if (txNew.vout.size() == 3)
