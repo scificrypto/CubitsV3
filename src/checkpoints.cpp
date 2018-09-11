@@ -196,8 +196,8 @@ static MapCheckpoints mapCheckpointsTestnet =
         // Proof-of-work blocks are immediately checkpointed
         // to defend against 51% attack which rejects other miners block 
 
-        // Select the last proof-of-work block
-        const CBlockIndex *pindex = GetLastBlockIndex(pindexBest, false);
+        // Select the last  block
+        const CBlockIndex *pindex = pindexBest;
         // Search forward for a block within max span and maturity window
         while (pindex->pprev && (pindex->nHeight + 8 > pindexBest->nHeight))
             pindex = pindex->pprev;

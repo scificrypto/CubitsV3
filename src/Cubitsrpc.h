@@ -127,6 +127,7 @@ extern int64 nWalletUnlockTime;
 extern int64 AmountFromValue(const json_spirit::Value& value);
 extern json_spirit::Value ValueFromAmount(int64 amount);
 extern double GetDifficulty(const CBlockIndex* blockindex = NULL);
+extern double GetPoSKernelPS(const CBlockIndex* blockindex = NULL);
 extern std::string HexBits(unsigned int nBits);
 extern std::string HelpRequiringPassphrase();
 extern void EnsureWalletIsUnlocked();
@@ -179,6 +180,8 @@ extern json_spirit::Value encryptwallet(const json_spirit::Array& params, bool f
 extern json_spirit::Value validateaddress(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getinfo(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value reservebalance(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value splitthreshold(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value combinethreshold(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value checkwallet(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value repairwallet(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value resendtx(const json_spirit::Array& params, bool fHelp);

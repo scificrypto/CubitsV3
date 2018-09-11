@@ -7,7 +7,7 @@
 #include "addresstablemodel.h"
 #include "optionsmodel.h"
 #include "coincontrol.h"
-#include "bitcoinrpc.h"
+#include "Cubitsrpc.h"
 
 #include <QApplication>
 #include <QCheckBox>
