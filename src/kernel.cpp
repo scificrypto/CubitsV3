@@ -300,8 +300,9 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock& blockFrom, unsigned 
         return error("CheckStakeKernelHash() : nTime violation");
 
     unsigned int nTimeBlockFrom = blockFrom.GetBlockTime();
-    if (nTimeBlockFrom + GetStakeMinAge(nTimeBlockFrom) > nTimeTx) // Min age requirement
-        return error("CheckStakeKernelHash() : min age violation");
+    if (nTimeBlockFrom + nStakeMinAgeV2 > nTimeTx) // Min age requirement
+        //return error("CheckStakeKernelHash() : min age violation");
+      return false;
 
     CBigNum bnTargetPerCoinDay;
     bnTargetPerCoinDay.SetCompact(nBits);
