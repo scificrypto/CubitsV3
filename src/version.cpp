@@ -56,7 +56,7 @@ const std::string CLIENT_NAME("Cubits");
 
 #ifndef BUILD_DATE
 #    ifdef GIT_COMMIT_DATE
-#        define BUILD_DATE "Sep 14, 2018"
+#        define BUILD_DATE "Feb 1, 2019"
 #    else
 #        define BUILD_DATE __DATE__ ", " __TIME__
 #    endif
